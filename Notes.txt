@@ -1,0 +1,5 @@
+sudo apt update -y && sudo apt install -y python3.10-tk
+
+
+To run:
+Update file  camel/model_backend.py    Set env variables

@@ -78,8 +78,16 @@ class OpenAIModel(ModelBackend):
                     base_url=BASE_URL,
                 )
             else:
-                client = openai.OpenAI(
-                    api_key=OPENAI_API_KEY
+                #client = openai.OpenAI(api_key=OPENAI_API_KEY)
+
+                os.environ["OPENAI_API_VERSION"] = "2023-07-01-preview"
+                os.environ["AZURE_OPENAI_ENDPOINT"] = "https://xyz.openai.azure.com/"
+                os.environ["AZURE_OPENAI_API_KEY"] = ""
+
+                client = openai.AzureOpenAI(
+                    api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+                    api_version=os.getenv("OPENAI_API_VERSION"),
+                    azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
                 )
 
             num_max_token_map = {
@@ -96,8 +104,10 @@ class OpenAIModel(ModelBackend):
             num_max_completion_tokens = num_max_token - num_prompt_tokens
             self.model_config_dict['max_tokens'] = num_max_completion_tokens
 
-            response = client.chat.completions.create(*args, **kwargs, model=self.model_type.value,
-                                                      **self.model_config_dict)
+            #response = client.chat.completions.create(*args, **kwargs, model=self.model_type.value,
+            #                                          **self.model_config_dict)
+            response = client.chat.completions.create(*args, **kwargs, model="gpt-35-turbo-16k",
+                                                    ** self.model_config_dict)
 
             cost = prompt_cost(
                 self.model_type.value,
